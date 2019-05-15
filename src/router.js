@@ -7,7 +7,7 @@ import Members from './views/Members.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
@@ -29,7 +29,8 @@ export default new Router({
     {
       path: '/members',
       name: 'members',
-      component: Members
+      component: Members,
+      meta: { requiresAuth: true }
     },
     // {
     //   path: '/about',
@@ -41,3 +42,36 @@ export default new Router({
     // }
   ]
 })
+
+
+router.beforeEach((to, from, next) => {
+  let routerAuthCheck = true;
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+
+
+    if(routerAuthCheck) {
+      //user is Authenticated
+      //TODO: commit to store that the user Authenticated
+      next();
+    } else {
+      //user not Authenticated
+      router.replace('/login')
+    }
+
+    // if (!auth.loggedIn()) {
+    //   next({
+    //     path: '/login',
+    //     query: { redirect: to.fullPath }
+    //   })
+    // } else {
+    //   next()
+    // }
+  } else {
+    next() // make sure to always call next()!
+  }
+})
+
+
+export default router;
